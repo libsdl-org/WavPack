@@ -24,8 +24,8 @@ ASSEMBLY_SRC_X64 := \
 
 WAVPACK_DSD_CFLAGS := -DENABLE_DSD
 WAVPACK_DSD_SRC := \
-    src/pack_dsd.c \
-    src/unpack_dsd.c
+	src/pack_dsd.c \
+	src/unpack_dsd.c
 
 # legacy support is disabled by default
 WAVPACK_LEGACY_CFLAGS := -DENABLE_LEGACY
@@ -57,10 +57,9 @@ endif
 
 
 LOCAL_CFLAGS := $(WAVPACK_DSD_CFLAGS) $(PLATFORM_CFLAGS)
+# $(WAVPACK_LEGACY_CFLAGS)
 
 LOCAL_SRC_FILES := \
-	$(PLATFORM_SRC) \
-	$(WAVPACK_DSD_SRC) \
     src/common_utils.c \
     src/decorr_utils.c \
     src/entropy_utils.c \
@@ -81,8 +80,11 @@ LOCAL_SRC_FILES := \
     src/unpack_floats.c \
     src/unpack_seek.c \
     src/unpack_utils.c \
-    src/write_words.c
+    src/write_words.c \
+    $(WAVPACK_DSD_SRC) \
+    $(PLATFORM_SRC)
+# $(WAVPACK_LEGACY_SRC)
 
 LOCAL_EXPORT_C_INCLUDES += $(LOCAL_C_INCLUDES)
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
