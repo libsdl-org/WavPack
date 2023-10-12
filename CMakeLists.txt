@@ -146,7 +146,7 @@ endif()
 # Dependent options
 
 cmake_dependent_option(WAVPACK_ENABLE_ASM "Enable assembly optimizations" ON "HAVE_ASM OR HAVE_MASM" OFF)
-cmake_dependent_option(WAVPACK_ENABLE_LIBCRYPTO "Use OpenSSL::Crypto library" ON "OPENSSL_FOUND" OFF)
+cmake_dependent_option(WAVPACK_ENABLE_LIBCRYPTO "Use OpenSSL::Crypto library" OFF "OPENSSL_FOUND" OFF)
 cmake_dependent_option(WAVPACK_BUILD_PROGRAMS "Build programs" ${WAVPACK_ROOTPROJECT} "WIN32 OR Iconv_FOUND" OFF)
 cmake_dependent_option(WAVPACK_BUILD_COOLEDIT_PLUGIN "Build CoolEdit plugin" ${WAVPACK_ROOTPROJECT} "WIN32" OFF)
 cmake_dependent_option(WAVPACK_BUILD_WINAMP_PLUGIN "Build WinAmp plugin" ${WAVPACK_ROOTPROJECT} "WIN32" OFF)
