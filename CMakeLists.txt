@@ -78,7 +78,6 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(FeatureSummary)
 include(CPack)
-include(FindOpenSSL)
 
 # Options. See also dependent options below
 
@@ -95,9 +94,10 @@ if(HAVE_LIBM)
     list(APPEND CMAKE_REQUIRED_LIBRARIES m)
 endif()
 
-find_package(Threads)
+if(NOT WIN32)
+  find_package(Threads)
+endif()
 find_package(Iconv)
-find_package(OpenSSL)
 
 check_c_source_compiles(
         "int main()
@@ -146,10 +146,9 @@ endif()
 # Dependent options
 
 cmake_dependent_option(WAVPACK_ENABLE_ASM "Enable assembly optimizations" ON "HAVE_ASM OR HAVE_MASM" OFF)
-cmake_dependent_option(WAVPACK_ENABLE_LIBCRYPTO "Use OpenSSL::Crypto library" OFF "OPENSSL_FOUND" OFF)
 cmake_dependent_option(WAVPACK_BUILD_PROGRAMS "Build programs" ${WAVPACK_ROOTPROJECT} "WIN32 OR Iconv_FOUND" OFF)
-cmake_dependent_option(WAVPACK_BUILD_COOLEDIT_PLUGIN "Build CoolEdit plugin" ${WAVPACK_ROOTPROJECT} "WIN32" OFF)
-cmake_dependent_option(WAVPACK_BUILD_WINAMP_PLUGIN "Build WinAmp plugin" ${WAVPACK_ROOTPROJECT} "WIN32" OFF)
+cmake_dependent_option(WAVPACK_BUILD_COOLEDIT_PLUGIN "Build CoolEdit plugin" OFF "WIN32" OFF)
+cmake_dependent_option(WAVPACK_BUILD_WINAMP_PLUGIN "Build WinAmp plugin" OFF "WIN32" OFF)
 cmake_dependent_option(BUILD_TESTING "Build tests" ${WAVPACK_ROOTPROJECT} "NOT WIN32" OFF)
 
 # Targets
@@ -207,22 +206,6 @@ target_link_libraries(wavpack
 )
 add_library(WavPack::WavPack ALIAS wavpack)
 
-if(CMAKE_VERSION VERSION_LESS 3.4)
-    target_include_directories(wavpack
-        PRIVATE
-            $<$<BOOL:${WAVPACK_ENABLE_LIBCRYPTO}>:${OPENSSL_INCLUDE_DIR}>
-    )
-    target_link_libraries(wavpack
-        PRIVATE
-            $<$<BOOL:${WAVPACK_ENABLE_LIBCRYPTO}>:${OPENSSL_CRYPTO_LIBRARY}>
-    )
-else()
-    target_link_libraries(wavpack
-        PRIVATE
-            $<$<BOOL:${WAVPACK_ENABLE_LIBCRYPTO}>:OpenSSL::Crypto>
-    )
-endif()
-
 target_compile_definitions(wavpack
     PRIVATE
         $<$<BOOL:${WAVPACK_ENABLE_LEGACY}>:ENABLE_LEGACY>
@@ -230,7 +213,6 @@ target_compile_definitions(wavpack
         $<$<BOOL:${MSVC}>:_CRT_SECURE_NO_WARNINGS>
         $<$<BOOL:${HAVE___BUILTIN_CLZ}>:HAVE___BUILTIN_CLZ>
         $<$<BOOL:${HAVE_FSEEKO}>:HAVE_FSEEKO>
-        $<$<BOOL:${WAVPACK_ENABLE_LIBCRYPTO}>:HAVE_LIBCRYPTO>
         $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${CPU_ASM_X86}>>:OPT_ASM_X86>
         $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${CPU_ASM_X64}>>:OPT_ASM_X64>
         $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${CPU_ASM_ARM32}>>:OPT_ASM_ARM32>
@@ -480,7 +462,6 @@ if(WAVPACK_BUILD_PROGRAMS)
 			$<$<NOT:$<BOOL:${WIN32}>>:Iconv::Iconv>
 			$<$<BOOL:${HAVE_LIBM}>:m>
 	)
-
 endif()
 
 if(WAVPACK_BUILD_COOLEDIT_PLUGIN)
@@ -576,13 +557,8 @@ set(WAVPACK_DOC_NAMES
     wvtag
 )
 
-# Features
 
-set_package_properties(OpenSSL PROPERTIES
-	TYPE RECOMMENDED
-	DESCRIPTION "TLS/SSL and crypto library"
-    PURPOSE "Can be used to build wavpack library."
-)
+# Features
 
 set_package_properties(Iconv PROPERTIES
 	TYPE RECOMMENDED
@@ -601,9 +577,7 @@ add_feature_info(WAVPACK_ENABLE_LEGACY WAVPACK_ENABLE_LEGACY "Decode legacy (< 4
 add_feature_info(WAVPACK_ENABLE_DSD WAVPACK_ENABLE_DSD "Enable support for WavPack DSD files.")
 add_feature_info(WAVPACK_INSTALL_CMAKE_MODULE WAVPACK_INSTALL_CMAKE_MODULE "Generate and install CMake package configuration module.")
 
-
 add_feature_info(WAVPACK_ENABLE_ASM WAVPACK_ENABLE_ASM "Enable assembly optimizations.")
-add_feature_info(WAVPACK_ENABLE_LIBCRYPTO WAVPACK_ENABLE_LIBCRYPTO "Use OpenSSL::Crypto library.")
 add_feature_info(WAVPACK_BUILD_PROGRAMS WAVPACK_BUILD_PROGRAMS "Build programs.")
 add_feature_info(WAVPACK_BUILD_COOLEDIT_PLUGIN WAVPACK_BUILD_COOLEDIT_PLUGIN "Build CoolEdit plugin.")
 add_feature_info(WAVPACK_BUILD_WINAMP_PLUGIN WAVPACK_BUILD_WINAMP_PLUGIN "Build WinAmp plugin.")
@@ -611,6 +585,7 @@ add_feature_info(WAVPACK_INSTALL_DOCS WAVPACK_INSTALL_DOCS "Install documentatio
 add_feature_info(WAVPACK_INSTALL_PKGCONFIG_MODULE WAVPACK_INSTALL_PKGCONFIG_MODULE "Generate and install wavpack.pc.")
 
 feature_summary(WHAT ALL)
+
 
 # Installation
 
@@ -679,7 +654,7 @@ endif()
 # Tests
 
 if(BUILD_TESTING AND (NOT WIN32))
-
+    # FIXME: wvtest relies on pthreads only and doesn't use win32 threads
     enable_testing()
 
     add_executable(wvtest
@@ -699,5 +674,4 @@ if(BUILD_TESTING AND (NOT WIN32))
             $<$<BOOL:${HAVE_LIBM}>:m>
     )
     add_test(NAME wvtest COMMAND $<TARGET_FILE:wvtest> --exhaustive --short --no-extras)
-
 endif()
