@@ -200,6 +200,9 @@ target_link_libraries(wavpack
         $<$<BOOL:${HAVE_LIBM}>:m>
 )
 add_library(WavPack::WavPack ALIAS wavpack)
+if(PSP OR PS2)
+    target_compile_definitions(wavpack PRIVATE DISABLE_WavpackOpenFileInput)
+endif()
 
 target_compile_definitions(wavpack
     PRIVATE
