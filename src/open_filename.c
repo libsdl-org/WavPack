@@ -73,6 +73,8 @@ static FILE *fopen_utf8 (const char *filename_utf8, const char *mode_utf8);
 #define _fseeki64 fseeko64
 #endif
 
+#if !defined(DISABLE_WavpackOpenFileInput)
+
 static int32_t read_bytes (void *id, void *data, int32_t bcount)
 {
     return (int32_t) fread (data, 1, bcount, (FILE*) id);
@@ -309,6 +311,8 @@ WavpackContext *WavpackOpenFileInput (const char *infilename, char *error, int f
 
     return WavpackOpenFileInputEx64 (&freader, wv_id, wvc_id, error, flags, norm_offset);
 }
+
+#endif
 
 #ifdef _WIN32
 
