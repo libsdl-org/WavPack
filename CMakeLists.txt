@@ -205,6 +205,9 @@ target_link_libraries(wavpack
         $<$<BOOL:${HAVE_LIBM}>:m>
 )
 add_library(WavPack::WavPack ALIAS wavpack)
+if(PSP OR PS2)
+    target_compile_definitions(wavpack PRIVATE DISABLE_WavpackOpenFileInput)
+endif()
 
 target_compile_definitions(wavpack
     PRIVATE
@@ -331,7 +334,7 @@ if(BUILD_SHARED_LIBS)
     endforeach()
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym ${FILE_CONTENTS})
     if(CMAKE_VERSION VERSION_LESS 3.13)
-        set_target_properties(wavpack PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list,'${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym'") 
+        set_target_properties(wavpack PROPERTIES LINK_FLAGS "-Wl,-exported_symbols_list,'${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym'")
     else()
         target_link_directories(wavpack PRIVATE "-Wl,-exported_symbols_list,${CMAKE_CURRENT_BINARY_DIR}/libwavpack.sym")
     endif()
