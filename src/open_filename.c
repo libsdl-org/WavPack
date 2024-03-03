@@ -159,7 +159,7 @@ static int32_t write_bytes (void *id, void *data, int32_t bcount)
     return (int32_t) fwrite (data, 1, bcount, (FILE*) id);
 }
 
-#if defined(__WATCOMC__) && defined(_WIN32) /* no _chsize_s() in watcom... */
+#if defined(_WIN32) /*&& defined(__WATCOMC__)*/ /* no _chsize_s() in watcom or in old msvcrt.dll */
 
 static int truncate_here (void *id)
 {
