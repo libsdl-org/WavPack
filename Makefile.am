@@ -15,6 +15,7 @@ EXTRA_DIST = \
 	cmake/CheckCLinkerFlag.cmake \
 	cmake/modules/FindIconv.cmake \
 	cmake/TestLargeFiles.cmake \
+	cmake/wavpackcpu.cmake \
 	\
 	cli/Makefile.w32 \
 	src/Makefile.os2 \
