@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = wavpack.pc
 
@@ -13,7 +15,6 @@ dist_html_DATA = \
 EXTRA_DIST = \
 	CMakeLists.txt \
 	cmake/CheckCLinkerFlag.cmake \
-	cmake/modules/FindIconv.cmake \
 	cmake/TestLargeFiles.cmake \
 	cmake/wavpackcpu.cmake \
 	\
@@ -39,7 +40,6 @@ MAINTAINERCLEANFILES = \
 	ar-lib \
 	compile \
 	config.guess \
-	config.rpath \
 	config.sub \
 	configure \
 	depcomp \

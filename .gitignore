@@ -21,7 +21,6 @@ cli/wvunpack
 compile
 config.guess
 config.log
-config.rpath
 config.status
 config.sub
 configure
@@ -29,6 +28,7 @@ depcomp
 install-sh
 libtool
 ltmain.sh
+m4/
 missing
 src/.deps/
 src/.dirstamp
