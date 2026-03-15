@@ -117,7 +117,23 @@ test_large_files(LARGE_FILES_SUPPORTED)
 if(LARGE_FILES_SUPPORTED)
     add_definitions(${LARGE_FILES_DEFINITIONS})
 endif()
-check_function_exists(fseeko HAVE_FSEEKO)
+check_c_source_compiles("
+  #define _POSIX_C_SOURCE 200112L
+  #include <stdio.h>
+  int main(int argc, char **argv) {
+    FILE *file = fopen(\"file\", \"r\");
+    int retval = !(fseeko(file, 0, SEEK_SET) >= 0 && ftello(file) >= 0);
+    fclose(file);
+    return retval;
+  }" HAVE_FSEEKO)
+if(HAVE_FSEEKO)
+  add_definitions(-D_POSIX_C_SOURCE=200112L)
+endif()
+
+if(NOT WIN32)
+  # Needed for strcasecmp
+  add_definitions(-D_DEFAULT_SOURCE)
+endif()
 
 if(NOT MSVC AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang"))
     add_compile_options(-Wall)
