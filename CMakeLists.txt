@@ -213,6 +213,9 @@ target_compile_definitions(wavpack
         $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${WavPack_CPU_X64}>>:OPT_ASM_X64>
         $<$<AND:$<BOOL:${WAVPACK_ENABLE_ASM}>,$<BOOL:${WavPack_CPU_ARM32}>>:OPT_ASM_ARM32>
 )
+target_compile_definitions(wavpack PRIVATE
+    _POSIX_C_SOURCE=200809L
+)
 
 if(WAVPACK_ENABLE_ASM AND HAVE_MASM AND WavPack_CPU_X86)
 	set_source_files_properties(src/pack_x86.asm src/unpack_x86.asm PROPERTIES COMPILE_FLAGS "/safeseh")

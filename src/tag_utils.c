@@ -21,6 +21,7 @@
 #ifdef _WIN32
 #define stricmp(x,y) _stricmp(x,y)
 #else
+#include <strings.h>
 #define stricmp strcasecmp
 #endif
 #endif
